@@ -17,4 +17,8 @@
 
 ### Automated
 - Script hits /health, /scores, and POSTs scores to validate happy path and errors.
- - Optional: add a simple Playwright or Cypress check for presence of audio controls (out of scope for this minimal plan).
+- Optional: add a simple Playwright or Cypress check for presence of audio controls (out of scope for this minimal plan).
+
+Quick dev sanity checks:
+- Python: `python tests/test_check_files_tool.py`
+- Python: `python tests/validate_step5_expected_tree.py`
