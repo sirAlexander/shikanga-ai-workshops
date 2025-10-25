@@ -105,7 +105,7 @@ npx -y codex --version
 
 <a id="step-3"></a>
 ## Step 3 — Start Codex as an MCP server (stdio)
-Create `codex_mcp.py`:
+Create `test_codex_mcp.py`:
 ```python
 import asyncio
 from agents import Agent, Runner
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
 Run once:
 ```bash
-python3 codex_mcp.py
+python3 test_codex_mcp.py
 ```
 **Expect:** `Codex MCP server started.`
 
@@ -135,7 +135,7 @@ python3 codex_mcp.py
 
 <a id="step-4"></a>
 ## Step 4 — Single-agent workflow: tiny game generator
-Replace `codex_mcp.py` with:
+Create `codex_mcp.py`:
 ```python
 import os, asyncio
 from dotenv import load_dotenv
@@ -354,7 +354,7 @@ if __name__ == "__main__":
 
 Run:
 ```bash
-python multi_agent_workflow.py
+python3 multi_agent_workflow.py
 ```
 
 **Expected tree:**
@@ -405,7 +405,9 @@ start .\frontend\index.html
   `{"approval-policy":"never","sandbox":"workspace-write"}` and you’re running in the project directory.  
 - **`npx` is slow** → install Codex globally and change:
   ```python
-  params={"command":"codex","args":["mcp"]}
+  old - params={"command":"codex","args":["mcp"]}
+  
+  new - params={"command": "codex", "args": ["mcp-server"]},
   ```
 - **MCP timeouts** → keep `client_session_timeout_seconds` large for long tasks.  
 - **Windows venv activation** → if blocked, run PowerShell as user/admin and  

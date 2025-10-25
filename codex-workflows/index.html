@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Catch the Dot!</title>
+    <style>
+      :root {
+        --bg-1: #0f172a; /* slate-900 */
+        --bg-2: #111827; /* gray-900 */
+        --card: #0b1023;
+        --text: #e5e7eb; /* gray-200 */
+        --muted: #9ca3af; /* gray-400 */
+        --accent: #60a5fa; /* blue-400 */
+        --good: #34d399; /* emerald-400 */
+        --shadow: 0 10px 30px rgba(0,0,0,.35), 0 2px 8px rgba(0,0,0,.2);
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--text);
+        background: radial-gradient(1200px 800px at 10% 10%, #1f2937 0%, var(--bg-2) 40%),
+                    radial-gradient(800px 600px at 90% 90%, #111827 0%, var(--bg-1) 50%);
+        display: grid;
+        place-items: center;
+        line-height: 1.4;
+      }
+
+      main.wrap {
+        width: min(92vw, 900px);
+        padding: 24px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: var(--shadow);
+      }
+
+      h1 {
+        margin: 0 0 12px 0;
+        font-size: clamp(22px, 3vw, 34px);
+        letter-spacing: 0.4px;
+      }
+
+      .sub {
+        margin: 0 0 16px 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .hud {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px 16px;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+
+      .stat {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        font-weight: 600;
+        background: rgba(255,255,255,0.04);
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.08);
+      }
+
+      .label { color: var(--muted); font-weight: 500; }
+      #time { color: var(--accent); font-variant-numeric: tabular-nums; }
+      #score { color: var(--good); font-variant-numeric: tabular-nums; }
+
+      .progress {
+        position: relative;
+        height: 10px;
+        width: 100%;
+        background: rgba(255,255,255,0.07);
+        border-radius: 999px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .progress .bar {
+        position: absolute;
+        inset: 0 0 0 auto;
+        width: 100%;
+        background: linear-gradient(90deg, #22c55e, #84cc16, #eab308, #f59e0b, #ef4444);
+        background-size: 200% 100%;
+        animation: flow 6s linear infinite;
+        transition: width 200ms linear;
+      }
+
+      @keyframes flow {
+        0% { background-position: 0% 0; }
+        100% { background-position: 200% 0; }
+      }
+
+      .board {
+        position: relative;
+        width: min(92vw, 640px);
+        aspect-ratio: 1 / 1;
+        border-radius: 16px;
+        background: radial-gradient(120% 120% at 30% 20%, rgba(96,165,250,0.08), rgba(255,255,255,0.02)),
+                    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        touch-action: manipulation;
+        user-select: none;
+      }
+
+      /* The Dot */
+      .dot {
+        --dotHue: 210;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: clamp(32px, 6vmin, 56px);
+        height: clamp(32px, 6vmin, 56px);
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        background: radial-gradient(circle at 35% 35%, hsl(var(--dotHue) 85% 65%), hsl(var(--dotHue) 85% 50%));
+        box-shadow: 0 15px 25px rgba(0,0,0,.35), inset 0 2px 6px rgba(255,255,255,.25);
+        transition: transform 120ms ease, box-shadow 150ms ease;
+        outline: none;
+      }
+      .dot:hover { box-shadow: 0 18px 28px rgba(0,0,0,.42), inset 0 2px 6px rgba(255,255,255,.3); }
+      .dot:active { transform: translate(-50%, -50%) scale(0.94); }
+      .dot:focus-visible { box-shadow: 0 0 0 3px rgba(96,165,250,.5), 0 10px 20px rgba(0,0,0,.35); }
+      .dot.move { animation: pop 180ms ease; }
+      .dot.hit  { animation: hit 180ms ease; }
+
+      @keyframes pop {
+        from { transform: translate(-50%, -50%) scale(0.9); }
+        to   { transform: translate(-50%, -50%) scale(1); }
+      }
+      @keyframes hit {
+        0%   { transform: translate(-50%, -50%) scale(1); }
+        50%  { transform: translate(-50%, -50%) scale(1.15); }
+        100% { transform: translate(-50%, -50%) scale(1); }
+      }
+
+      /* End overlay */
+      .overlay {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(5, 8, 20, 0.55);
+        backdrop-filter: blur(3px);
+      }
+      .overlay.show { display: flex; }
+      .panel {
+        text-align: center;
+        background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+        border: 1px solid rgba(255,255,255,0.12);
+        padding: 22px 20px;
+        border-radius: 14px;
+        width: min(90%, 420px);
+        box-shadow: var(--shadow);
+      }
+      .panel h2 { margin: 0 0 6px; font-size: 22px; }
+      .panel p { margin: 6px 0; color: var(--muted); }
+
+      .btn {
+        appearance: none;
+        border: none;
+        background: linear-gradient(180deg, #60a5fa, #3b82f6);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        letter-spacing: .3px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(59,130,246,.35), inset 0 1px 0 rgba(255,255,255,.2);
+        transition: transform 120ms ease, box-shadow 150ms ease;
+      }
+      .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 22px rgba(59,130,246,.45), inset 0 1px 0 rgba(255,255,255,.25); }
+      .btn:active { transform: translateY(1px); }
+
+      .footer { color: var(--muted); margin-top: 14px; font-size: 14px; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .dot { transition: none; animation: none; }
+        .dot.move, .dot.hit { animation: none; }
+        .progress .bar { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>Catch the Dot!</h1>
+      <p class="sub">Click the colorful dot as many times as you can in 30 seconds.</p>
+
+      <div class="hud" aria-label="Scoreboard">
+        <div class="stat" aria-live="polite"><span class="label">Time</span><span id="time">30</span>s</div>
+        <div class="progress" aria-hidden="true"><div class="bar" id="bar" style="width:100%"></div></div>
+        <div class="stat" aria-live="polite"><span class="label">Score</span><span id="score">0</span></div>
+      </div>
+
+      <div class="board" id="board" aria-label="Game board">
+        <button id="dot" class="dot" aria-label="Catch me" title="Catch me!" type="button"></button>
+
+        <div class="overlay" id="overlay" aria-live="polite">
+          <div class="panel">
+            <h2>Time's up!</h2>
+            <p>Your score: <strong id="finalScore">0</strong></p>
+            <p class="hint">Nice clicking! Want to try again?</p>
+            <button id="restart" class="btn" type="button">Restart</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="footer">Tip: The dot jumps to a new random spot every second.</p>
+    </main>
+
+    <script>
+      (function() {
+        const GAME_DURATION = 30; // seconds
+        const MOVE_INTERVAL = 1000; // ms
+
+        const board = document.getElementById('board');
+        const dot = document.getElementById('dot');
+        const timeEl = document.getElementById('time');
+        const scoreEl = document.getElementById('score');
+        const overlay = document.getElementById('overlay');
+        const finalScoreEl = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restart');
+        const bar = document.getElementById('bar');
+
+        let score = 0;
+        let timeLeft = GAME_DURATION;
+        let isRunning = false;
+        let timerId = null;
+        let moverId = null;
+
+        function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+        function placeDotRandomly() {
+          const rect = board.getBoundingClientRect();
+          const size = dot.offsetWidth; // dot is a square
+          const radius = size / 2;
+
+          const maxX = rect.width - radius;
+          const maxY = rect.height - radius;
+          const x = Math.random() * (maxX - radius) + radius; // center position
+          const y = Math.random() * (maxY - radius) + radius;
+
+          dot.style.left = x + 'px';
+          dot.style.top = y + 'px';
+
+          // Fresh color each jump
+          const hue = Math.floor(Math.random() * 360);
+          dot.style.setProperty('--dotHue', String(hue));
+
+          // Nudge animation
+          dot.classList.remove('move');
+          // reflow to restart animation
+          void dot.offsetWidth;
+          dot.classList.add('move');
+        }
+
+        function updateHUD() {
+          timeEl.textContent = String(timeLeft);
+          scoreEl.textContent = String(score);
+          bar.style.width = ((timeLeft / GAME_DURATION) * 100).toFixed(2) + '%';
+        }
+
+        function startGame() {
+          if (isRunning) return;
+          isRunning = true;
+          score = 0;
+          timeLeft = GAME_DURATION;
+          overlay.classList.remove('show');
+          dot.style.pointerEvents = 'auto';
+          updateHUD();
+          placeDotRandomly();
+
+          moverId = setInterval(placeDotRandomly, MOVE_INTERVAL);
+          timerId = setInterval(() => {
+            timeLeft -= 1;
+            updateHUD();
+            if (timeLeft <= 0) {
+              endGame();
+            }
+          }, 1000);
+        }
+
+        function endGame() {
+          if (!isRunning) return;
+          isRunning = false;
+          clearInterval(moverId); moverId = null;
+          clearInterval(timerId); timerId = null;
+          dot.style.pointerEvents = 'none';
+          finalScoreEl.textContent = String(score);
+          overlay.classList.add('show');
+        }
+
+        // Interactions
+        dot.addEventListener('click', () => {
+          if (!isRunning) return;
+          score += 1;
+          scoreEl.textContent = String(score);
+          dot.classList.remove('hit');
+          void dot.offsetWidth; // restart animation
+          dot.classList.add('hit');
+        });
+
+        restartBtn.addEventListener('click', startGame);
+        window.addEventListener('resize', () => { if (isRunning) placeDotRandomly(); });
+
+        // Auto-start when ready
+        window.addEventListener('DOMContentLoaded', startGame);
+      })();
+    </script>
+  </body>
+</html>
+
