@@ -3,7 +3,7 @@
 ---------------------------------------
 |        Bug Busters (Title)          |
 |                                     |
-|   Score: 0       Time: 20           |
+|   Score: 0       Time: 20    [🔊][====] |
 |                                     |
 |   [  GAME AREA (400x400px)   ]      |
 |                                     |

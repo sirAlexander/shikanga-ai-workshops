@@ -24,6 +24,26 @@ h1 { text-align: center; font-size: 2.1em; margin: 0 0 18px; font-weight: 800; c
   font-size: 1.1em;
   color: #333;
 }
+/* Audio controls */
+#audio-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+#sound-toggle {
+  border: none;
+  background: #e9f2e9;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+#sound-toggle[aria-pressed="true"] {
+  background: #f0f0f0;
+}
+#sound-volume {
+  width: 110px;
+}
 #game-area-wrapper {
   display: flex;
   flex-direction: column;
@@ -52,6 +72,55 @@ h1 { text-align: center; font-size: 2.1em; margin: 0 0 18px; font-weight: 800; c
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Squish effect */
+.squish {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  transform-origin: center center;
+  /* subtle red splat backdrop */
+  /* background color is set inline via JS using hsla() per-hit */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: squishFade 900ms ease-out forwards;
+  z-index: 5;
+}
+
+.squish .bug-emoji {
+  font-size: 2.4em;
+  transform: scaleY(0.35) scaleX(1.1) rotate(var(--rot, 12deg));
+  filter: brightness(0.85) saturate(1.2);
+}
+
+@keyframes squishFade {
+  0%   { opacity: 0; transform: scale(0.9); }
+  10%  { opacity: 1; transform: scale(1); }
+  70%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* Floating +1 score indicator */
+.score-float {
+  position: absolute;
+  left: 0; top: 0;
+  pointer-events: none;
+  color: #2e7d32;
+  font-weight: 800;
+  text-shadow: 0 1px 0 #fff, 0 0 6px rgba(46,125,50,0.35);
+  transform: translate(-50%, 0);
+  animation: floatUp 700ms ease-out forwards;
+  z-index: 6;
+}
+
+@keyframes floatUp {
+  0%   { opacity: 0; transform: translate(-50%, 0) scale(0.9); }
+  15%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -26px) scale(1.05); }
 }
 #start-btn {
   background: #91c788;

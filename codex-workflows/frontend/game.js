@@ -1,6 +1,11 @@
 const gameDuration = 20;
 const bugSize = 44;
 let score = 0, timeLeft = gameDuration, timerId = null, gameActive = false;
+let audioCtx = null; // created on first interaction
+let soundEnabled = true;
+let soundVolume = 0.6; // 0..1
+const LS_SOUND_ENABLED = 'BB_SOUND_ENABLED';
+const LS_SOUND_VOL = 'BB_SOUND_VOL';
 
 const bugEl = document.getElementById('bug'),
       gameArea = document.getElementById('game-area'),
@@ -47,6 +52,8 @@ function startGame() {
   startBtn.disabled = true;
   bugEl.textContent = '🪲';
   bugEl.style.display = 'flex';
+  // Try resume context on gesture if it exists but suspended
+  try { if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume(); } catch {}
   moveBug();
   timerId = setInterval(()=>{
     timeLeft--;
@@ -60,6 +67,13 @@ function bugClick(e) {
   if(!gameActive) return;
   score++;
   scoreEl.textContent = score;
+  // Render a squish effect at the current bug position before moving
+  try {
+    renderSquishEffect();
+  } catch {}
+  try {
+    playSquishSound();
+  } catch {}
   moveBug();
 }
 
@@ -151,7 +165,119 @@ submitBtn.addEventListener('click', submitScore);
 nameInput.addEventListener('input', handleNameInput);
 
 window.addEventListener('DOMContentLoaded', ()=>{
+  // Load persisted audio settings
+  try {
+    const savedEnabled = localStorage.getItem(LS_SOUND_ENABLED);
+    if (savedEnabled !== null) soundEnabled = savedEnabled === '1';
+    const savedVol = parseFloat(localStorage.getItem(LS_SOUND_VOL));
+    if (!Number.isNaN(savedVol)) soundVolume = Math.min(1, Math.max(0, savedVol));
+  } catch {}
+
   updateLeaderboard();
   // For keyboard focus (accessibility)
   bugEl.setAttribute('tabindex', '0');
+
+  // Wire audio controls
+  const toggleBtn = document.getElementById('sound-toggle');
+  const volSlider = document.getElementById('sound-volume');
+  if (toggleBtn && volSlider) {
+    volSlider.value = String(soundVolume);
+    updateAudioUI(toggleBtn);
+    toggleBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      persistAudio();
+      updateAudioUI(toggleBtn);
+    });
+    volSlider.addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value);
+      soundVolume = isNaN(v) ? 0.6 : Math.min(1, Math.max(0, v));
+      persistAudio();
+    });
+  }
 });
+
+// --- Visual Effects --------------------------------------------------------
+function renderSquishEffect() {
+  // Get current bug position within the game area
+  const left = parseFloat(getComputedStyle(bugEl).left || '0');
+  const top  = parseFloat(getComputedStyle(bugEl).top  || '0');
+
+  const squish = document.createElement('div');
+  squish.className = 'squish';
+  squish.style.left = `${left - 2}px`;   // nudge to center backdrop
+  squish.style.top  = `${top - 2}px`;
+  // random slight rotation so it feels less repetitive
+  const rot = (Math.random()*24 - 12).toFixed(1) + 'deg';
+  squish.style.setProperty('--rot', rot);
+  // varied splat color hue
+  const hue = Math.floor(Math.random()*360);
+  squish.style.background = `radial-gradient(hsla(${hue}, 80%, 60%, 0.28), hsla(${hue}, 80%, 60%, 0.12) 40%, transparent 70%)`;
+
+  const emoji = document.createElement('div');
+  emoji.className = 'bug-emoji';
+  emoji.textContent = '🪲';
+  squish.appendChild(emoji);
+
+  gameArea.appendChild(squish);
+  // Cleanup after animation
+  setTimeout(()=> squish.remove(), 1000);
+
+  // Floating +1 score indicator
+  const float = document.createElement('div');
+  float.className = 'score-float';
+  float.textContent = '+1';
+  float.style.left = (left + bugSize/2) + 'px';
+  float.style.top  = (top - 6) + 'px';
+  gameArea.appendChild(float);
+  setTimeout(()=> float.remove(), 750);
+}
+
+function playSquishSound() {
+  if (!soundEnabled) return;
+  if (!(window.AudioContext || window.webkitAudioContext)) return;
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const ctx = audioCtx;
+  const now = ctx.currentTime;
+
+  // Short pitch-down squelch
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(240, now);
+  osc.frequency.exponentialRampToValueAtTime(90, now + 0.09);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.22 * soundVolume, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.14);
+
+  // Optional tiny noise burst for texture
+  const noiseDur = 0.08;
+  const buffer = ctx.createBuffer(1, ctx.sampleRate * noiseDur, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i=0; i<data.length; i++) data[i] = (Math.random()*2-1) * 0.45;
+  const noise = ctx.createBufferSource();
+  const ng = ctx.createGain();
+  ng.gain.setValueAtTime(0.0001, now);
+  ng.gain.exponentialRampToValueAtTime(0.12 * soundVolume, now + 0.005);
+  ng.gain.exponentialRampToValueAtTime(0.0001, now + noiseDur);
+  noise.buffer = buffer;
+  noise.connect(ng).connect(ctx.destination);
+  noise.start(now);
+}
+
+function persistAudio() {
+  try {
+    localStorage.setItem(LS_SOUND_ENABLED, soundEnabled ? '1' : '0');
+    localStorage.setItem(LS_SOUND_VOL, String(soundVolume));
+  } catch {}
+}
+
+function updateAudioUI(toggleBtn) {
+  toggleBtn.setAttribute('aria-pressed', String(!soundEnabled));
+  toggleBtn.title = soundEnabled ? 'Sound: On' : 'Sound: Off';
+  toggleBtn.textContent = soundEnabled ? '🔊' : '🔈';
+}

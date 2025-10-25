@@ -15,6 +15,7 @@
 ### UI Elements
 - **Score**: Always visible above game area. Updates with every bug click.
 - **Timer**: Beside or below score (shows seconds left).
+- **Audio Controls**: Sound toggle button (🔊/🔈) and a volume slider (0–100%), state persisted in localStorage.
 - **Start Button**: Centered below game area. Disabled/hidden when game in progress.
 
 ### End-of-Game Modal
@@ -40,3 +41,8 @@
 2. Click Start → bug appears/moves, score & timer active.
 3. 20s end: modal overlays, prompts name, submits, leaderboard updates.
 4. Player can replay as often as desired.
+### Hit Feedback & Sound
+- On every successful hit:
+  - Show a temporary squish/splat under the bug with a random hue.
+  - Display a floating “+1” near the hit that rises and fades.
+  - Play a short “squish” sound (WebAudio), subject to user gesture and the audio toggle.
