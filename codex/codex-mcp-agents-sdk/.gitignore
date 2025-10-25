@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+dist/
+build/
+.eggs/
+*.log
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Node
+node_modules/
+npm-debug.log*
+.yarn/*
+.pnp.*
+
+# IDE/OS
+.DS_Store
+.idea/
+.vscode/
+
+# Coverage/Reports
+.coverage
+coverage.xml
+htmlcov/

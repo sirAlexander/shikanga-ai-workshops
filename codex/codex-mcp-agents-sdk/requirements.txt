@@ -1,0 +1,4 @@
+# Pinned versions (adjust if pip fails on your platform/CI)
+openai==1.40.2
+openai-agents==0.3.0
+python-dotenv==1.0.1

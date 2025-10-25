@@ -1,19 +1,34 @@
 # Building Consistent Workflows with Codex CLI & the OpenAI Agents SDK — A Step-by-Step Guide
 
-
 > Turn Codex CLI into an MCP server, build a single-agent workflow, and scale to a gated multi-agent system with traceability and repeatability.
 
-
 > An improved open-ai cookbook that has been updated so that its now laid out as a hands-on, step-by-step tutorial
+> 
+---
+
+## Table of Contents
+- [What you’ll build](#toc-what-youll-build)
+- [Step 0 — Prerequisites](#step-0)
+- [Step 1 — Project setup](#step-1)
+- [Step 2 — Quick sanity checks](#step-2)
+- [Step 3 — Start Codex as an MCP server](#step-3)
+- [Step 4 — Single-agent workflow: tiny game generator](#step-4)
+- [Step 5 — Multi-agent workflow with gated handoffs](#step-5)
+- [Step 6 — Traces (observability)](#step-6)
+- [Step 7 — Troubleshooting & tips](#step-7)
+- [Step 8 — What you now have](#step-8)
 
 ---
 
+
+<a id="toc-what-youll-build"></a>
 ## What you’ll build
 1) **Single-agent**: “Designer” hands off to a “Developer” that uses **Codex (via MCP)** to generate a tiny browser game (`index.html`).  
 2) **Multi-agent**: PM → Designer → Frontend + Backend (parallel) → Tester, with **gated handoffs** and **observable traces**.
 
 ---
 
+<a id="step-0"></a>
 ## Step 0 — Prerequisites (once per machine)
 - **Node.js 18+**
   ```bash
@@ -35,6 +50,7 @@
 
 ---
 
+<a id="step-1"></a>
 ## Step 1 — Project setup (new directory)
 ```bash
 mkdir codex-workflows && cd codex-workflows
@@ -63,6 +79,7 @@ printf "openai\nopenai-agents\npython-dotenv\n" > requirements.txt
 
 ---
 
+<a id="step-2"></a>
 ## Step 2 — Quick sanity checks
 **Agents SDK import**
 ```python
@@ -86,6 +103,7 @@ npx -y codex --version
 
 ---
 
+<a id="step-3"></a>
 ## Step 3 — Start Codex as an MCP server (stdio)
 Create `codex_mcp.py`:
 ```python
@@ -115,6 +133,7 @@ python codex_mcp.py
 
 ---
 
+<a id="step-4"></a>
 ## Step 4 — Single-agent workflow: tiny game generator
 Replace `codex_mcp.py` with:
 ```python
@@ -177,6 +196,7 @@ Open it:
 
 ---
 
+<a id="step-5"></a>
 ## Step 5 — Multi-agent workflow with gated handoffs
 Create `multi_agent_workflow.py`:
 ```python
@@ -371,6 +391,7 @@ start .\frontend\index.html
 
 ---
 
+<a id="step-6"></a>
 ## Step 6 — Traces (observability)
 - View runs in **OpenAI dashboard → Traces**.  
 - Inspect spans for prompts, MCP tool calls, file writes, timings, and handoffs.  
@@ -378,6 +399,7 @@ start .\frontend\index.html
 
 ---
 
+<a id="step-7"></a>
 ## Step 7 — Troubleshooting & tips
 - **Codex can’t write / asks for approval** → ensure instructions include  
   `{"approval-policy":"never","sandbox":"workspace-write"}` and you’re running in the project directory.  
@@ -392,6 +414,7 @@ start .\frontend\index.html
 
 ---
 
+<a id="step-8"></a>
 ## Step 8 — What you now have
 - **Repeatable** agent orchestration using Codex MCP with safe file-write policies.  
 - **Gated** handoffs that only proceed when required artifacts exist.  
