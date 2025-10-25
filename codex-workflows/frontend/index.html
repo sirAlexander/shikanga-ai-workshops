@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bug Busters</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="container">
+    <h1>Bug Busters</h1>
+    <section id="hud">
+      <span id="score-label">Score: <span id="score">0</span></span>
+      <span id="timer-label">Time: <span id="timer">20</span></span>
+    </section>
+    <section id="game-area-wrapper">
+      <div id="game-area">
+        <div id="bug" tabindex="0" aria-label="Bug"></div>
+      </div>
+      <button id="start-btn">Start</button>
+    </section>
+    <aside id="leaderboard-container">
+      <h2>Leaderboard</h2>
+      <ol id="leaderboard">
+        <li>Loading...</li>
+      </ol>
+      <div id="leaderboard-error" class="error"></div>
+    </aside>
+    <div id="modal" class="hidden" role="dialog" aria-modal="true">
+      <div id="modal-content">
+        <h3 id="modal-msg">Game Over!</h3>
+        <div id="final-score"></div>
+        <label for="player-name">Name:</label>
+        <input maxlength="12" id="player-name" type="text" autocomplete="off">
+        <button id="submit-score-btn">Submit Score</button>
+        <button id="play-again-btn">Play Again</button>
+        <div id="modal-error" class="error"></div>
+      </div>
+    </div>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>

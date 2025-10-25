@@ -1,0 +1,10 @@
+{
+  "name": "bug-busters-backend",
+  "version": "1.0.0",
+  "description": "Minimal API for Bug Busters game (in-memory, no DB)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}
