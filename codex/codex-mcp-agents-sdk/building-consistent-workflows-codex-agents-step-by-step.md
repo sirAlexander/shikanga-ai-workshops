@@ -1,5 +1,6 @@
 # Building Consistent Workflows with Codex CLI & the OpenAI Agents SDK — A Step-by-Step Guide
 
+
 > Turn Codex CLI into an MCP server, build a single-agent workflow, and scale to a gated multi-agent system with traceability and repeatability.
 
 
