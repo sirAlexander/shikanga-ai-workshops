@@ -113,9 +113,9 @@ from agents.mcp import MCPServerStdio
 
 async def main() -> None:
     async with MCPServerStdio(
-        name="Codex CLI",
-        params={"command": "npx", "args": ["-y", "codex", "mcp"]},
-        client_session_timeout_seconds=360000,
+            name="Codex CLI",
+            params={"command": "codex", "args": ["mcp-server"]},
+            client_session_timeout_seconds=360000,
     ) as codex_mcp_server:
         print("Codex MCP server started.")
         # Add agent logic in next steps
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
 Run once:
 ```bash
-python codex_mcp.py
+python3 codex_mcp.py
 ```
 **Expect:** `Codex MCP server started.`
 
