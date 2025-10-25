@@ -682,3 +682,7 @@ start .\frontend\index.html
 
 
 > _Reference_: [openai original cookbook](https://github.com/openai/openai-cookbook/blob/main/examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk.ipynb)
+
+---
+
+Looking for the completed project and run pointers? See the companion README in the workflows folder: [../../codex-workflows/README.md](../../codex-workflows/README.md)
