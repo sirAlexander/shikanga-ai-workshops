@@ -59,7 +59,7 @@ mkdir codex-workflows && cd codex-workflows
 printf "OPENAI_API_KEY=sk-REPLACE_ME\n" > .env
 
 # Python virtual env
-python -m venv .venv
+python3 -m venv .venv
 # macOS/Linux:
 source .venv/bin/activate
 # Windows PowerShell:
@@ -91,7 +91,7 @@ except Exception as e:
     print("Agents SDK import failed:", e)
 ```
 ```bash
-python sanity_agents.py
+python3 sanity_agents.py
 ```
 
 **Codex availability**
@@ -147,9 +147,9 @@ set_default_openai_api(os.getenv("OPENAI_API_KEY"))
 
 async def main() -> None:
     async with MCPServerStdio(
-        name="Codex CLI",
-        params={"command": "npx", "args": ["-y", "codex", "mcp"]},
-        client_session_timeout_seconds=360000,
+            name="Codex CLI",
+            params={"command": "codex", "args": ["mcp-server"]},
+            client_session_timeout_seconds=360000,
     ) as codex_mcp_server:
 
         developer = Agent(
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
 Run:
 ```bash
-python codex_mcp.py
+python3 codex_mcp.py
 ```
 
 **Success check:** `index.html` appears at project root.  
@@ -213,7 +213,7 @@ set_default_openai_api(os.getenv("OPENAI_API_KEY"))
 async def main() -> None:
     async with MCPServerStdio(
         name="Codex CLI",
-        params={"command": "npx", "args": ["-y", "codex", "mcp"]},
+        params={"command": "codex", "args": ["mcp-server"]},
         client_session_timeout_seconds=360000,
     ) as codex_mcp_server:
 
