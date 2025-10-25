@@ -24,7 +24,7 @@ python multi_agent_workflow.py
 ```
 
 > The full, step-by-step guide lives here:  
-> **building-consistent-workflows-codex-agents-step-by-step.md**
+> **[→ click here for guide](building-consistent-workflows-codex-agents-step-by-step.md)**
 
 ## CI
 A GitHub Actions workflow is included at **.github/workflows/agents-workflow.yml**.  
